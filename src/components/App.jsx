@@ -1,87 +1,67 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Statistic from './Statistic';
 import Feedback from './Feedback';
 import Notification from './Notification';
 import Section from './Section';
 
-class App extends Component {
-  state = {
-    g: 0,
-    n: 0,
-    b: 0,
-  };
+export default function App() {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
-  handleFeedback = event => {
+  const handleFeedback = event => {
     const { name } = event.target;
     switch (name) {
       case 'good':
-        this.setState(prevState => ({
-          g: prevState.g + 1,
-        }));
+        setGood(prevGood => prevGood + 1);
         break;
 
       case 'neutral':
-        this.setState(prevState => ({
-          n: prevState.n + 1,
-        }));
+        setNeutral(neutral + 1);
         break;
 
       case 'bad':
-        this.setState(prevState => ({
-          b: prevState.b + 1,
-        }));
+        setBad(bad + 1);
         break;
 
       default:
-        throw new Error('error');
+        console.log('Помилка!');
     }
   };
 
-  countTotalFeedback(a, b, c) {
-    return a + b + c;
-  }
+  const [total, setTotal] = useState(0);
+  const [countPositiveFeed, setCountPositiveFeed] = useState(0);
 
-  countPositiveFeedbackPercentage(g, n, b) {
-    return Math.floor((g / (g + n + b)) * 100);
-  }
+  useEffect(() => {
+    setTotal(good + neutral + bad);
+    setCountPositiveFeed(Math.floor((good / (good + neutral + bad)) * 100));
+  }, [good, neutral, bad]);
 
-  render() {
-    const { g, n, b } = this.state;
-    const {
-      handleFeedback,
-      countTotalFeedback,
-      countPositiveFeedbackPercentage,
-    } = this;
-    const total = countTotalFeedback(g, n, b);
-
-    return (
-      <>
-        <Section title="Please, leave fedback">
-          <Feedback
-            options={['good', 'neutral', 'bad']}
-            onLeaveFeedback={handleFeedback}
+  return (
+    <>
+      <Section title="Please, leave fedback">
+        <Feedback
+          options={['good', 'neutral', 'bad']}
+          onClick={handleFeedback}
+        />
+      </Section>
+      <Section title="Statistics">
+        {total === 0 ? (
+          <Notification message="There is no feedback" />
+        ) : (
+          <Statistic
+            good={good}
+            neutral={neutral}
+            bad={bad}
+            total={total}
+            positivePercentage={countPositiveFeed}
           />
-        </Section>
-        <Section title="Statistics">
-          {total === 0 ? (
-            <Notification message="There is no feedback" />
-          ) : (
-            <Statistic
-              good={g}
-              neutral={n}
-              bad={b}
-              total={total}
-              positivePercentage={countPositiveFeedbackPercentage(g, n, b)}
-            />
-          )}
-        </Section>
-      </>
-    );
-  }
+        )}
+      </Section>
+    </>
+  );
 }
-
-export default App;
 
 App.propTypes = {
   handleFeedback: PropTypes.func,
@@ -90,5 +70,5 @@ App.propTypes = {
   n: PropTypes.number,
   b: PropTypes.number,
   total: PropTypes.number,
-  countPositiveFeedbackPercentage: PropTypes.func,
+  countPositiveFeed: PropTypes.func,
 };
