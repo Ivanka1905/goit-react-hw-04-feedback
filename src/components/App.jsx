@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Statistic from './Statistic';
 import Feedback from './Feedback';
@@ -14,15 +14,15 @@ export default function App() {
     const { name } = event.target;
     switch (name) {
       case 'good':
-        setGood(prevGood => prevGood + 1);
+        setGood(prevState => prevState + 1);
         break;
 
       case 'neutral':
-        setNeutral(neutral + 1);
+        setNeutral(prevState => prevState + 1);
         break;
 
       case 'bad':
-        setBad(bad + 1);
+        setBad(prevState => prevState + 1);
         break;
 
       default:
@@ -30,13 +30,8 @@ export default function App() {
     }
   };
 
-  const [total, setTotal] = useState(0);
-  const [countPositiveFeed, setCountPositiveFeed] = useState(0);
-
-  useEffect(() => {
-    setTotal(good + neutral + bad);
-    setCountPositiveFeed(Math.floor((good / (good + neutral + bad)) * 100));
-  }, [good, neutral, bad]);
+  const total = good + neutral + bad;
+  const positive = Math.floor((good / (good + neutral + bad)) * 100);
 
   return (
     <>
@@ -55,7 +50,7 @@ export default function App() {
             neutral={neutral}
             bad={bad}
             total={total}
-            positivePercentage={countPositiveFeed}
+            positivePercentage={positive}
           />
         )}
       </Section>
@@ -65,10 +60,9 @@ export default function App() {
 
 App.propTypes = {
   handleFeedback: PropTypes.func,
-  countTotalFeedback: PropTypes.func,
-  g: PropTypes.number,
-  n: PropTypes.number,
-  b: PropTypes.number,
+  good: PropTypes.number,
+  neutral: PropTypes.number,
+  bad: PropTypes.number,
   total: PropTypes.number,
-  countPositiveFeed: PropTypes.func,
+  positive: PropTypes.func,
 };
